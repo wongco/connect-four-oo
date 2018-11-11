@@ -12,6 +12,22 @@ class Game {
   constructor(height, width) {
     this.height = height;
     this.width = width;
+    this.boundHandleClick = this.handleClick.bind(this);
+    this.createStartButton();
+  }
+
+  createStartButton() {
+    const gameEl = document.getElementById('game');
+    const startButton = document.createElement('button');
+    startButton.innerText = 'Start New Game';
+    startButton.setAttribute('id', 'startButton');
+    startButton.addEventListener('click', this.startGame.bind(this));
+    gameEl.appendChild(startButton);
+  }
+
+  startGame() {
+    const boardEl = document.getElementById('board');
+    boardEl.innerText = '';
     this.currPlayer = 1; // active player: 1 or 2
     this.board = []; // array of rows, each row is array of cells  (board[y][x])
     this.isGameOver = false;
@@ -35,7 +51,7 @@ class Game {
     // make column tops (clickable area for adding a piece to that column)
     const top = document.createElement('tr');
     top.setAttribute('id', 'column-top');
-    top.addEventListener('click', this.handleClick.bind(this));
+    top.addEventListener('click', this.boundHandleClick);
 
     for (let x = 0; x < this.width; x++) {
       const headCell = document.createElement('td');
@@ -87,6 +103,11 @@ class Game {
   endGame(msg) {
     this.isGameOver = true;
     alert(msg);
+    const top = document.getElementById('column-top');
+    if (top) {
+      console.log('trying to remove');
+      top.removeEventListener('click', this.boundHandleClick);
+    }
   }
 
   /** handleClick: handle click of column top to play piece */
