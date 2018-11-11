@@ -42,7 +42,7 @@ class Game {
     playerTwoColorInputText.setAttribute('name', 'playerTwoColor');
     playerTwoColorInputText.setAttribute('id', 'playerTwoColor');
     playerTwoColorInputText.setAttribute('placeholder', 'valid color');
-    playerTwoColorInputText.setAttribute('value', 'yellow');
+    playerTwoColorInputText.setAttribute('value', 'blue');
     gameEl.appendChild(playerTwoColorInputText);
 
     // create startButton Submission
@@ -185,7 +185,7 @@ class Game {
   /** checkForWin: check board cell-by-cell for "does a win start here?" */
 
   checkForWin() {
-    function _win(cells) {
+    const _win = cells => {
       // Check four cells to see if they're all color of current player
       //  - cells: list of four (y, x) cells
       //  - returns true if all are legal coordinates & all match currPlayer
@@ -198,7 +198,7 @@ class Game {
           x < this.width &&
           this.board[y][x] === this.currPlayer.color
       );
-    }
+    };
 
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
@@ -210,12 +210,7 @@ class Game {
         const diagDL = [[y, x], [y + 1, x - 1], [y + 2, x - 2], [y + 3, x - 3]];
 
         // find winner (only checking each win-possibility as needed)
-        if (
-          _win.call(this, horiz) ||
-          _win.call(this, vert) ||
-          _win.call(this, diagDR) ||
-          _win.call(this, diagDL)
-        ) {
+        if (_win(horiz) || _win(vert) || _win(diagDR) || _win(diagDL)) {
           return true;
         }
       }
