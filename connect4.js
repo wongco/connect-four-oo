@@ -13,24 +13,67 @@ class Game {
     this.height = height;
     this.width = width;
     this.boundHandleClick = this.handleClick.bind(this);
-    this.createStartButton();
+    this.createStartForm();
   }
 
-  createStartButton() {
+  createStartForm() {
     const gameEl = document.getElementById('game');
+
+    // create playerOne Color Text Submission
+    const playerOneColorInputLabel = document.createElement('label');
+    playerOneColorInputLabel.setAttribute('for', 'playerOneColor');
+    playerOneColorInputLabel.innerText = 'Player One Color:';
+    gameEl.appendChild(playerOneColorInputLabel);
+    const playerOneColorInputText = document.createElement('input');
+    playerOneColorInputText.setAttribute('type', 'text');
+    playerOneColorInputText.setAttribute('name', 'playerOneColor');
+    playerOneColorInputText.setAttribute('id', 'playerOneColor');
+    playerOneColorInputText.setAttribute('placeholder', 'valid color');
+    playerOneColorInputText.setAttribute('value', 'red');
+    gameEl.appendChild(playerOneColorInputText);
+
+    // create playerTwo Color Text Submission
+    const playerTwoColorInput = document.createElement('label');
+    playerTwoColorInput.setAttribute('for', 'playerTwoColor');
+    playerTwoColorInput.innerText = 'Player Two Color:';
+    gameEl.appendChild(playerTwoColorInput);
+    const playerTwoColorInputText = document.createElement('input');
+    playerTwoColorInputText.setAttribute('type', 'text');
+    playerTwoColorInputText.setAttribute('name', 'playerTwoColor');
+    playerTwoColorInputText.setAttribute('id', 'playerTwoColor');
+    playerTwoColorInputText.setAttribute('placeholder', 'valid color');
+    playerTwoColorInputText.setAttribute('value', 'blue');
+    gameEl.appendChild(playerTwoColorInputText);
+
+    // create startButton Submission
     const startButton = document.createElement('button');
     startButton.innerText = 'Start New Game';
     startButton.setAttribute('id', 'startButton');
     startButton.addEventListener('click', this.startGame.bind(this));
     gameEl.appendChild(startButton);
+
+    // <input type = 'text' name = 'PlayerOneColo
   }
 
   startGame() {
+    const playerOneColorEl = document.getElementById('playerOneColor');
+    const playerTwoColorEl = document.getElementById('playerTwoColor');
+    const p1color = playerOneColorEl.value;
+    const p2color = playerTwoColorEl.value;
+    if (p1color === p2color || p1color === '' || p2color === '') {
+      alert('Please choose valid colors');
+      return;
+    }
+
+    // clear previous gameboard
     const boardEl = document.getElementById('board');
     boardEl.innerText = '';
-    this.currPlayer = 1; // active player: 1 or 2
+
     this.board = []; // array of rows, each row is array of cells  (board[y][x])
     this.isGameOver = false;
+    this.playerOne = new Player(p1color);
+    this.playerTwo = new Player(p2color);
+    this.currPlayer = this.playerOne; // active player: 1 or 2
     this.makeBoard();
     this.makeHtmlBoard();
   }
@@ -91,7 +134,7 @@ class Game {
   placeInTable(y, x) {
     const piece = document.createElement('div');
     piece.classList.add('piece');
-    piece.classList.add(`p${this.currPlayer}`);
+    piece.style.backgroundColor = this.currPlayer.color;
     piece.style.top = -50 * (y + 2);
 
     const spot = document.getElementById(`${y}-${x}`);
@@ -105,7 +148,6 @@ class Game {
     alert(msg);
     const top = document.getElementById('column-top');
     if (top) {
-      console.log('trying to remove');
       top.removeEventListener('click', this.boundHandleClick);
     }
   }
@@ -122,7 +164,7 @@ class Game {
     }
 
     // place piece in board and add to HTML table
-    this.board[y][x] = this.currPlayer;
+    this.board[y][x] = this.currPlayer.color;
     this.placeInTable(y, x);
 
     // check for tie
@@ -132,11 +174,12 @@ class Game {
 
     // check for win
     if (this.checkForWin()) {
-      return this.endGame(`Player ${this.currPlayer} won!`);
+      return this.endGame(`Player ${this.currPlayer.color} won!`);
     }
 
     // switch players
-    this.currPlayer = this.currPlayer === 1 ? 2 : 1;
+    this.currPlayer =
+      this.currPlayer === this.playerOne ? this.playerTwo : this.playerOne;
   }
 
   /** checkForWin: check board cell-by-cell for "does a win start here?" */
@@ -153,7 +196,7 @@ class Game {
           y < this.height &&
           x >= 0 &&
           x < this.width &&
-          this.board[y][x] === this.currPlayer
+          this.board[y][x] === this.currPlayer.color
       );
     }
 
@@ -177,6 +220,12 @@ class Game {
         }
       }
     }
+  }
+}
+
+class Player {
+  constructor(color) {
+    this.color = color;
   }
 }
 
