@@ -14,7 +14,7 @@ class Game {
     this.width = width;
     this.currPlayer = 1; // active player: 1 or 2
     this.board = []; // array of rows, each row is array of cells  (board[y][x])
-    //this.handleClick = this.handleClick.bind(this);
+    this.isGameOver = false;
     this.makeBoard();
     this.makeHtmlBoard();
   }
@@ -85,6 +85,7 @@ class Game {
   /** endGame: announce game end */
 
   endGame(msg) {
+    this.isGameOver = true;
     alert(msg);
   }
 
@@ -95,7 +96,7 @@ class Game {
     const x = +evt.target.id;
     // get next spot in column (if none, ignore click)
     const y = this.findSpotForCol(x);
-    if (y === null) {
+    if (y === null || this.isGameOver === true) {
       return;
     }
 
