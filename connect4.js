@@ -42,7 +42,7 @@ class Game {
     playerTwoColorInputText.setAttribute('name', 'playerTwoColor');
     playerTwoColorInputText.setAttribute('id', 'playerTwoColor');
     playerTwoColorInputText.setAttribute('placeholder', 'valid color');
-    playerTwoColorInputText.setAttribute('value', 'blue');
+    playerTwoColorInputText.setAttribute('value', 'yellow');
     gameEl.appendChild(playerTwoColorInputText);
 
     // create startButton Submission
@@ -229,4 +229,4 @@ class Player {
   }
 }
 
-const game1 = new Game(HEIGHT, WIDTH);
+new Game(HEIGHT, WIDTH);
