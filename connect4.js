@@ -7,17 +7,22 @@
 
 const WIDTH = 7;
 const HEIGHT = 6;
+const MIN_PLAYERS = 2;
+const MAX_PLAYERS = 4;
 
 class Game {
   constructor(height, width) {
     this.height = height;
     this.width = width;
+    this.totalPlayers = MIN_PLAYERS;
     this.boundHandleClick = this.handleClick.bind(this);
     this.createStartForm();
   }
 
+  // creates all the Form data on the landing page of the game
   createStartForm() {
-    const createPlayersFormInput = function(totalPlayers) {
+    // creates form inputs for all players
+    const createPlayersFormInput = totalPlayers => {
       // remove prior form inputs
       const removeOldFormInputs = document.getElementById(
         'playersInputFormDiv'
@@ -31,7 +36,14 @@ class Game {
       playersInputFormDiv.setAttribute('id', 'playersInputFormDiv');
 
       // bank of available default colors for players - assumes max 4 players
-      const defaultColorList = ['red', 'blue', 'green', 'orange'];
+      const defaultColorList = [
+        'red',
+        'blue',
+        'green',
+        'orange',
+        'pink',
+        'yellow'
+      ];
 
       // create individual player form
       const createPlayerForm = idNum => {
@@ -45,6 +57,7 @@ class Game {
         playerColorInputText.setAttribute('name', `player${idNum}Color`);
         playerColorInputText.setAttribute('id', `player${idNum}Color`);
         playerColorInputText.setAttribute('placeholder', 'valid color');
+        // select color based on id and select color at array Index
         playerColorInputText.setAttribute('value', defaultColorList[idNum - 1]);
         playerInputFormDiv.appendChild(playerColorInputText);
         playersInputFormDiv.appendChild(playerInputFormDiv);
@@ -58,6 +71,7 @@ class Game {
       gameEl.appendChild(playersInputFormDiv);
     };
 
+    // creates DropDown Selection for amount of players to play with
     const createPlaysersDropDownInput = () => {
       const gameEl = document.getElementById('game');
       const totalPlayersInputDiv = document.createElement('div');
@@ -70,7 +84,7 @@ class Game {
       // Create dropdown option for 2 to 4 players
       const totalPlayersDropDown = document.createElement('select');
       totalPlayersDropDown.setAttribute('id', 'totalPlayers');
-      for (var i = 2; i <= 4; i++) {
+      for (var i = MIN_PLAYERS; i <= MAX_PLAYERS; i++) {
         const option = document.createElement('option');
         option.setAttribute('value', i);
         option.innerText = i;
@@ -86,6 +100,7 @@ class Game {
       gameEl.appendChild(totalPlayersInputDiv);
     };
 
+    // creates SubmitButton and EventListener for it
     const createSubmitButtonInput = () => {
       const gameEl = document.getElementById('game');
       const startButtonDiv = document.createElement('div');
@@ -99,22 +114,59 @@ class Game {
 
     createSubmitButtonInput();
     createPlaysersDropDownInput();
-    const totalPlayers = parseInt(
+    const initialTotalPlayers = parseInt(
       document.getElementById('totalPlayers').value
     );
-    createPlayersFormInput(totalPlayers);
+    createPlayersFormInput(initialTotalPlayers);
   }
 
+  // validates that player color inputs are unique
+  areUserColorsValid() {
+    const potentialPlayers = parseInt(
+      document.getElementById('totalPlayers').value
+    );
+
+    let uniqColors = new Set();
+    for (var idNum = 1; idNum <= potentialPlayers; idNum++) {
+      const playerSelectedColor = document.getElementById(`player${idNum}Color`)
+        .value;
+      uniqColors.add(playerSelectedColor);
+    }
+
+    if (uniqColors.size < potentialPlayers) {
+      return false;
+    }
+    return true;
+  }
+
+  // starts a new instance of the connection 4 game
   startGame() {
-    // logic to check if player setup info is valid
-    const playerOneColorEl = document.getElementById('playerOneColor');
-    const playerTwoColorEl = document.getElementById('playerTwoColor');
-    const p1color = playerOneColorEl.value;
-    const p2color = playerTwoColorEl.value;
-    if (p1color === p2color || p1color === '' || p2color === '') {
+    // sets the new game to the amount of players participating
+    const setNumberOfPlayers = () => {
+      this.totalPlayers = parseInt(
+        document.getElementById('totalPlayers').value
+      );
+    };
+
+    if (!this.areUserColorsValid()) {
       alert('Please choose valid colors');
       return;
     }
+
+    /** makePlayers: create the specified amount of players
+     * players = array of Player instances
+     */
+    const makePlayers = players => {
+      for (let idNum = 1; idNum <= players; idNum++) {
+        const playerSelectedColor = document.getElementById(
+          `player${idNum}Color`
+        ).value;
+        this.players.push(new Player(playerSelectedColor));
+      }
+    };
+
+    // set actual players from DropDownSelector
+    setNumberOfPlayers();
 
     // clear previous gameboard
     const boardEl = document.getElementById('board');
@@ -123,23 +175,11 @@ class Game {
     this.board = []; // array of rows, each row is array of cells  (board[y][x])
     this.isGameOver = false;
     this.players = []; // array of player instances, call method to initialize
-    this.playerOne = new Player(p1color);
-    this.playerTwo = new Player(p2color);
-    this.currPlayer = this.playerOne; // active player: 1 or 2
+    makePlayers(this.totalPlayers);
+    this.currPlayer = this.players[0]; // active player: first Player in totalPlayer array
     this.makeBoard();
     this.makeHtmlBoard();
   }
-
-  // /** makePlayers: create the specified amount of players
-  //  * players = array of Player instances
-  //  */
-  // makePlayers(players) {
-  //   for (let i = 0; i < players; i++) {
-  //     // get color of player
-  //     // create Player instance and push into Player array
-  //     players.push();
-  //   }
-  // }
 
   /** makeBoard: create in-JS board structure:
    *   board = array of rows, each row is array of cells  (board[y][x])
@@ -218,6 +258,16 @@ class Game {
   /** handleClick: handle click of column top to play piece */
 
   handleClick(evt) {
+    // returns the next player in the players Array, loops back to first if at the end
+    const getNextPlayer = () => {
+      const currPlayerIdx = this.players.indexOf(this.currPlayer);
+      if (currPlayerIdx === this.players.length - 1) {
+        return this.players[0];
+      } else {
+        return this.players[currPlayerIdx + 1];
+      }
+    };
+
     // get x from ID of clicked cell
     const x = +evt.target.id;
     // get next spot in column (if none, ignore click)
@@ -240,9 +290,7 @@ class Game {
       return this.endGame(`Player ${this.currPlayer.color} won!`);
     }
 
-    // switch players
-    this.currPlayer =
-      this.currPlayer === this.playerOne ? this.playerTwo : this.playerOne;
+    this.currPlayer = getNextPlayer();
   }
 
   /** checkForWin: check board cell-by-cell for "does a win start here?" */
