@@ -16,8 +16,16 @@ class Game {
     this.createStartForm();
   }
 
-  createDropDownInput() {
+  createPlaysersDropDownInput() {
     const gameEl = document.getElementById('game');
+    const totalPlayersInputDiv = document.createElement('div');
+
+    const totalPlayersLabel = document.createElement('label');
+    totalPlayersLabel.setAttribute('for', 'totalPlayers');
+    totalPlayersLabel.innerText = 'Total Players';
+    totalPlayersInputDiv.appendChild(totalPlayersLabel);
+
+    // Create dropdown option for 2 to 4 players
     const totalPlayersDropDown = document.createElement('select');
     totalPlayersDropDown.setAttribute('id', 'totalPlayers');
     for (var i = 2; i <= 4; i++) {
@@ -26,49 +34,72 @@ class Game {
       option.innerText = i;
       totalPlayersDropDown.appendChild(option);
     }
-    gameEl.appendChild(totalPlayersDropDown);
+    totalPlayersInputDiv.appendChild(totalPlayersDropDown);
+
+    // Create Dropdown Box Change Listener
+    totalPlayersDropDown.addEventListener('change', () => {
+      this.createPlayersFormInput(totalPlayersDropDown.value);
+    });
+
+    gameEl.appendChild(totalPlayersInputDiv);
   }
 
   createSubmitButtonInput() {
     const gameEl = document.getElementById('game');
+    const startButtonDiv = document.createElement('div');
     const startButton = document.createElement('button');
     startButton.innerText = 'Start New Game';
     startButton.setAttribute('id', 'startButton');
     startButton.addEventListener('click', this.startGame.bind(this));
-    gameEl.appendChild(startButton);
+    startButtonDiv.appendChild(startButton);
+    gameEl.appendChild(startButtonDiv);
   }
 
   createPlayersFormInput(totalPlayers) {
+    // remove prior form inputs
+    const removeOldFormInputs = document.getElementById('playersInputFormDiv');
+    if (removeOldFormInputs) {
+      removeOldFormInputs.remove();
+    }
+
     const gameEl = document.getElementById('game');
+    const playersInputFormDiv = document.createElement('div');
+    playersInputFormDiv.setAttribute('id', 'playersInputFormDiv');
+
     const defaultColorList = ['red', 'blue', 'green', 'orange']; // assumes max 4 players
 
     // create individual player form
     const createPlayerForm = function(idNum) {
+      const playerInputFormDiv = document.createElement('div');
       const playerColorInputLabel = document.createElement('label');
       playerColorInputLabel.setAttribute('for', `player${idNum}Color`);
       playerColorInputLabel.innerText = `Player ${idNum} Color:`;
-      gameEl.appendChild(playerColorInputLabel);
+      playerInputFormDiv.appendChild(playerColorInputLabel);
       const playerColorInputText = document.createElement('input');
       playerColorInputText.setAttribute('type', 'text');
       playerColorInputText.setAttribute('name', `player${idNum}Color`);
       playerColorInputText.setAttribute('id', `player${idNum}Color`);
       playerColorInputText.setAttribute('placeholder', 'valid color');
       playerColorInputText.setAttribute('value', defaultColorList[idNum - 1]);
-      gameEl.appendChild(playerColorInputText);
+      playerInputFormDiv.appendChild(playerColorInputText);
+      playersInputFormDiv.appendChild(playerInputFormDiv);
     };
 
     // initialized all the forms needed for the game
     for (let idNum = 1; idNum <= totalPlayers; idNum++) {
       createPlayerForm(idNum);
     }
+
+    gameEl.appendChild(playersInputFormDiv);
   }
 
   createStartForm() {
-    this.createDropDownInput();
+    this.createSubmitButtonInput();
+    this.createPlaysersDropDownInput();
     const totalPlayers = parseInt(
       document.getElementById('totalPlayers').value
     );
-    this.createSubmitButtonInput();
+
     this.createPlayersFormInput(totalPlayers);
   }
 
@@ -254,4 +285,4 @@ class Player {
   }
 }
 
-new Game(HEIGHT, WIDTH);
+const game1 = new Game(HEIGHT, WIDTH);
