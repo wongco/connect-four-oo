@@ -16,9 +16,31 @@ class Game {
     this.createStartForm();
   }
 
+  createDropDownInput() {
+    const gameEl = document.getElementById('game');
+    const totalPlayersDropDown = document.createElement('select');
+    totalPlayersDropDown.setAttribute('id', 'totalPlayers');
+    for (var i = 2; i <= 4; i++) {
+      const option = document.createElement('option');
+      option.setAttribute('value', i);
+      option.innerText = i;
+      totalPlayersDropDown.appendChild(option);
+    }
+    gameEl.appendChild(totalPlayersDropDown);
+  }
+
+  createSubmitButtonInput() {
+    const gameEl = document.getElementById('game');
+    const startButton = document.createElement('button');
+    startButton.innerText = 'Start New Game';
+    startButton.setAttribute('id', 'startButton');
+    startButton.addEventListener('click', this.startGame.bind(this));
+    gameEl.appendChild(startButton);
+  }
+
   createPlayersFormInput(totalPlayers) {
     const gameEl = document.getElementById('game');
-    const defaultColorList = ['red', 'blue', 'green', 'orange'];
+    const defaultColorList = ['red', 'blue', 'green', 'orange']; // assumes max 4 players
 
     // create individual player form
     const createPlayerForm = function(idNum) {
@@ -42,19 +64,12 @@ class Game {
   }
 
   createStartForm() {
-    const gameEl = document.getElementById('game');
-
-    // create Dropdown box value and create listener for it to dynamically update form
-    // TODO: Refactor Player Creation into function/array to accomodate multiplayer
-    const totalPlayers = 4;
+    this.createDropDownInput();
+    const totalPlayers = parseInt(
+      document.getElementById('totalPlayers').value
+    );
+    this.createSubmitButtonInput();
     this.createPlayersFormInput(totalPlayers);
-
-    // create startButton Submission
-    const startButton = document.createElement('button');
-    startButton.innerText = 'Start New Game';
-    startButton.setAttribute('id', 'startButton');
-    startButton.addEventListener('click', this.startGame.bind(this));
-    gameEl.appendChild(startButton);
   }
 
   startGame() {
