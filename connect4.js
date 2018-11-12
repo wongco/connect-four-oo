@@ -34,13 +34,13 @@ class Game {
       option.innerText = i;
       totalPlayersDropDown.appendChild(option);
     }
-    totalPlayersInputDiv.appendChild(totalPlayersDropDown);
 
-    // Create Dropdown Box Change Listener
+    // Create Dropdown Box Change Event Listener to Dynamically Update Forms
     totalPlayersDropDown.addEventListener('change', () => {
       this.createPlayersFormInput(totalPlayersDropDown.value);
     });
 
+    totalPlayersInputDiv.appendChild(totalPlayersDropDown);
     gameEl.appendChild(totalPlayersInputDiv);
   }
 
@@ -66,7 +66,8 @@ class Game {
     const playersInputFormDiv = document.createElement('div');
     playersInputFormDiv.setAttribute('id', 'playersInputFormDiv');
 
-    const defaultColorList = ['red', 'blue', 'green', 'orange']; // assumes max 4 players
+    // bank of available default colors for players - assumes max 4 players
+    const defaultColorList = ['red', 'blue', 'green', 'orange'];
 
     // create individual player form
     const createPlayerForm = function(idNum) {
@@ -85,7 +86,7 @@ class Game {
       playersInputFormDiv.appendChild(playerInputFormDiv);
     };
 
-    // initialized all the forms needed for the game
+    // initialized all the player forms needed for the game
     for (let idNum = 1; idNum <= totalPlayers; idNum++) {
       createPlayerForm(idNum);
     }
@@ -99,7 +100,6 @@ class Game {
     const totalPlayers = parseInt(
       document.getElementById('totalPlayers').value
     );
-
     this.createPlayersFormInput(totalPlayers);
   }
 
