@@ -16,36 +16,38 @@ class Game {
     this.createStartForm();
   }
 
+  createPlayersFormInput(totalPlayers) {
+    const gameEl = document.getElementById('game');
+    const defaultColorList = ['red', 'blue', 'green', 'orange'];
+
+    // create individual player form
+    const createPlayerForm = function(idNum) {
+      const playerColorInputLabel = document.createElement('label');
+      playerColorInputLabel.setAttribute('for', `player${idNum}Color`);
+      playerColorInputLabel.innerText = `Player ${idNum} Color:`;
+      gameEl.appendChild(playerColorInputLabel);
+      const playerColorInputText = document.createElement('input');
+      playerColorInputText.setAttribute('type', 'text');
+      playerColorInputText.setAttribute('name', `player${idNum}Color`);
+      playerColorInputText.setAttribute('id', `player${idNum}Color`);
+      playerColorInputText.setAttribute('placeholder', 'valid color');
+      playerColorInputText.setAttribute('value', defaultColorList[idNum - 1]);
+      gameEl.appendChild(playerColorInputText);
+    };
+
+    // initialized all the forms needed for the game
+    for (let idNum = 1; idNum <= totalPlayers; idNum++) {
+      createPlayerForm(idNum);
+    }
+  }
+
   createStartForm() {
     const gameEl = document.getElementById('game');
 
+    // create Dropdown box value and create listener for it to dynamically update form
     // TODO: Refactor Player Creation into function/array to accomodate multiplayer
-
-    // create playerOne Color Text Submission
-    const playerOneColorInputLabel = document.createElement('label');
-    playerOneColorInputLabel.setAttribute('for', 'playerOneColor');
-    playerOneColorInputLabel.innerText = 'Player One Color:';
-    gameEl.appendChild(playerOneColorInputLabel);
-    const playerOneColorInputText = document.createElement('input');
-    playerOneColorInputText.setAttribute('type', 'text');
-    playerOneColorInputText.setAttribute('name', 'playerOneColor');
-    playerOneColorInputText.setAttribute('id', 'playerOneColor');
-    playerOneColorInputText.setAttribute('placeholder', 'valid color');
-    playerOneColorInputText.setAttribute('value', 'red');
-    gameEl.appendChild(playerOneColorInputText);
-
-    // create playerTwo Color Text Submission
-    const playerTwoColorInput = document.createElement('label');
-    playerTwoColorInput.setAttribute('for', 'playerTwoColor');
-    playerTwoColorInput.innerText = 'Player Two Color:';
-    gameEl.appendChild(playerTwoColorInput);
-    const playerTwoColorInputText = document.createElement('input');
-    playerTwoColorInputText.setAttribute('type', 'text');
-    playerTwoColorInputText.setAttribute('name', 'playerTwoColor');
-    playerTwoColorInputText.setAttribute('id', 'playerTwoColor');
-    playerTwoColorInputText.setAttribute('placeholder', 'valid color');
-    playerTwoColorInputText.setAttribute('value', 'blue');
-    gameEl.appendChild(playerTwoColorInputText);
+    const totalPlayers = 4;
+    this.createPlayersFormInput(totalPlayers);
 
     // create startButton Submission
     const startButton = document.createElement('button');
@@ -53,11 +55,10 @@ class Game {
     startButton.setAttribute('id', 'startButton');
     startButton.addEventListener('click', this.startGame.bind(this));
     gameEl.appendChild(startButton);
-
-    // <input type = 'text' name = 'PlayerOneColo
   }
 
   startGame() {
+    // logic to check if player setup info is valid
     const playerOneColorEl = document.getElementById('playerOneColor');
     const playerTwoColorEl = document.getElementById('playerTwoColor');
     const p1color = playerOneColorEl.value;
@@ -73,12 +74,24 @@ class Game {
 
     this.board = []; // array of rows, each row is array of cells  (board[y][x])
     this.isGameOver = false;
+    this.players = []; // array of player instances, call method to initialize
     this.playerOne = new Player(p1color);
     this.playerTwo = new Player(p2color);
     this.currPlayer = this.playerOne; // active player: 1 or 2
     this.makeBoard();
     this.makeHtmlBoard();
   }
+
+  // /** makePlayers: create the specified amount of players
+  //  * players = array of Player instances
+  //  */
+  // makePlayers(players) {
+  //   for (let i = 0; i < players; i++) {
+  //     // get color of player
+  //     // create Player instance and push into Player array
+  //     players.push();
+  //   }
+  // }
 
   /** makeBoard: create in-JS board structure:
    *   board = array of rows, each row is array of cells  (board[y][x])
