@@ -19,6 +19,8 @@ class Game {
   createStartForm() {
     const gameEl = document.getElementById('game');
 
+    // TODO: Refactor Player Creation into function/array to accomodate multiplayer
+
     // create playerOne Color Text Submission
     const playerOneColorInputLabel = document.createElement('label');
     playerOneColorInputLabel.setAttribute('for', 'playerOneColor');
